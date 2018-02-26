@@ -1,0 +1,104 @@
+\documentclass[11pt]{ctexart}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{palatino}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\author{Song Qige 2017E8018661044}
+\title{091M4041H - Assignment 3 \\Algorithm Design and Analysis }
+
+\begin{document}
+ \begin{CJK*}{GBK}{song}
+  \maketitle
+   \section{判断数字序列能否构成图(1)}%第一题
+     \subsection{algorithm describe and pseudo-code}
+         \ 将序列按照非升序排列。每次取第一个元素arr[i]，将后面的arr[i]个元素的值-1。如果i+arr[i]超过n，说明不能构成无向图。如果-1的过程中出现负值，也不能构成无向图。arr[i]个元素的值-1完成后重新对序列排序。如果i从1到n 走完后arr[n]为0，说明可以构成无向图。
+         \begin{algorithm}
+         \begin{algorithmic}[1] %每行显示行号
+         \Function {DecideGraph}{$d[],len$}
+                \For{$i = 1 \to len$}
+                   \State sort(d+i,d+len)
+                   \If {$i+d[i] > n$}
+                   \State \Return{$false$}
+                   \EndIf
+                   \For{$j = i+1 \to len$}
+                   \State $d[j]--$;
+                   \If {$d[i] < 0$}
+                   \State \Return{$false$}
+           \algstore{bkbreak}
+           \end{algorithmic}
+           \end{algorithm}
+
+           \begin{algorithm}[h]
+           \begin{algorithmic}[1]
+           \algrestore{bkbreak}
+                   \EndIf
+                   \EndFor
+                \EndFor
+              \If {$d[len] != 0$}
+                   \State \Return{$false$}
+              \EndIf
+             \State \Return{$true$}
+         \EndFunction
+         \end{algorithmic}
+         \end{algorithm}
+     \subsection{greedy-choice property}
+      \ 贪心性质：由非负数组成的非增序列$s:d_1,d_2,...,d_n(n \ge 2,d_1 \ge 1)$可以构成无向图,当仅当序列$s1:d_2-1,d_3-1,...,d_{d1+1} -1,d_{d1+2},....,d_n$是可以构成无向图的。
+       \subsection{Prove the correctness}
+         \ 本解法采用了图论中判断可图性的Havel—Hakimi定理：由非负数组成的非增序列$s:d_1,d_2,...,d_n(n \ge 2,d_1 \ge 1)$是可图的，当仅当序列$s1:d_2-1,d_3-1,...,d_{d1+1}-1 ,d_{d1+2},...,d_n$ 是可图的。序列s1 中有n-1 个非负数，s序列中$d_1$ 后的前$d_1$ 个度数减1后构成$s_1$中的前$d_1$个数。 \\
+         定理证明：对于序列$s:d_1,d_2,...,d_n$，和序列$s1:d_2-1,d_3-1,...,d_{d1+1} -1,d_{d1+2},...,d_n$。如果s1 可图化，将s中最大度的点d1与s1中d1个点连一条边，可得到s图化的结果。\\
+         对于本题中的实现函数: \\
+         True Output:当函数返回值为真时，说明每次排序后的度序列中的最大值（设为$d_j$）都可以与度序列中剩余$d_j$个值代表的点连成边，直到所有的度均表现为边的形式，因此可以得到无向图G。\\
+         False Output:当函数返回值为假时，可能是排序后的度序列中的最大值$d_j$超过度序列中剩余值可以代表的点的个数，或度序列中的最大值$d_j$都不能与每一个与度序列中剩余的$d_j$个值代表的点连成边，这样该度数值无法表现为边，因此度序列无法构成无向图。
+
+       \subsection{time complexity}
+         \ 排序的时间复杂度<$O(n*(n*logn))$,总体时间复杂度$T(n) < O(n(n*logn+cn)) = O(n^2 * logn)$
+
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+       \section{判断s是否为t的子串(3)}%第三题
+       \subsection{Algorithm Description and pseudo-code}
+       \ 分别使用i和j从头遍历s和t，如果当前位置s[i]=t[j]，将i与j同时后移，否则只后移j。如果i可以移动到s结束则s是t的子串，如果j已经到t结束i还未到s结束则s不是t的子串。
+       \\
+         \begin{algorithm}
+         \begin{algorithmic}[1] %每行显示行号
+         \Function {isSubsequence}{$s[],s\_len,t[],t\_len$}
+                \While{$i < s\_len$ \textbf{and} $j < t\_len$}
+                  \If {$s[i] == t[j]$}
+                     \State $i++$
+                     \State $j++$
+                 \Else
+                      \State $j++$
+                 \EndIf
+                 \EndWhile
+                 \If {$i == s\_len$}
+                     \State \Return $true$
+                 \Else
+                     \State \Return $false$
+                 \EndIf
+         \EndFunction
+         \end{algorithmic}
+         \end{algorithm}
+
+       \subsection{greedy-choice property}
+       \ 贪心性质：将指针i,j分别从s和t的开头向后移动。如果s[i]=t[j]，同时后移指针i与j，否则后移j，继续判断s在i后面的序列是否为t在j后面的序列的子序列。
+       \subsection{Prove the correctness}
+       \  True Output:函数返回值为真说明s字符串的指针i从开始移动到了s结束，说明s的每个字符元素都在t中找到了相同元素，并且保持了原来的顺序。因此s是t的子串成立。 \\
+       False Output:函数返回值为假说明当t字符串的指针j已经移动到t结束时，s字符串中仍然有剩余字符未在t中找到相同元素，因此s是t的子串不成立。
+       \subsection{time complexity}
+         \ 设字符串t的长度为m，则时间复杂度为$O(m)$ \\
+         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+         \section{Programming(5)} %第五题
+         \subsection{result analysis}
+         \ Aesop\_Fables.txt文件原大小为186KB,Huffman编码后的文件大小为103KB。压缩率为54.497\%。graph.txt文件原大小为2198KB,Huffman 编码后的文件大小为910KB。压缩率为41.401\%。（压缩文件时，将原文件经哈夫曼编码后得到的01串每8个存为1个字符到编码文件中。）
+         \\ Aesop\_Fables.txt文件加入个人代码信息编码（SongQige2017E8018661044）后解码结果：\\
+         \includegraphics[width=4.00in,height=2.00in]{5_1.JPG}\\
+         \ graph.txt文件加入个人代码信息编码后解码结果：\\
+         \includegraphics[width=4.00in,height=2.00in]{5_2.JPG}\\
+ \end{CJK*}
+\end{document}
